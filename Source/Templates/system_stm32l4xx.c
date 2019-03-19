@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    system_stm32l4xx.c
   * @author  MCD Application Team
-  * @version V1.0.0
-  * @date    26-June-2015
+  * @version V1.1.0
+  * @date    26-February-2016
   * @brief   CMSIS Cortex-M4 Device Peripheral Access Layer System Source File
   *
   *   This file provides two functions and one global variable to be called from
@@ -68,7 +68,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -159,7 +159,7 @@
 /** @addtogroup STM32L4xx_System_Private_Variables
   * @{
   */
-  /* This variable is updated in three ways:
+  /* The SystemCoreClock variable is updated in three ways:
       1) by calling CMSIS function SystemCoreClockUpdate()
       2) by calling HAL API function HAL_RCC_GetHCLKFreq()
       3) each time HAL_RCC_ClockConfig() is called to configure the system clock frequency
@@ -170,6 +170,7 @@
   uint32_t SystemCoreClock = 4000000;
 
   const uint8_t  AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+  const uint8_t  APBPrescTable[8] =  {0, 0, 0, 0, 1, 2, 3, 4};
   const uint32_t MSIRangeTable[12] = {100000, 200000, 400000, 800000, 1000000, 2000000, \
                                       4000000, 8000000, 16000000, 24000000, 32000000, 48000000};
 /**
@@ -211,7 +212,7 @@ void SystemInit(void)
   RCC->CR &= (uint32_t)0xEAF6FFFF;
 
   /* Reset PLLCFGR register */
-  RCC->PLLCFGR = 0x00000800;
+  RCC->PLLCFGR = 0x00001000;
 
   /* Reset HSEBYP bit */
   RCC->CR &= (uint32_t)0xFFFBFFFF;
@@ -292,11 +293,11 @@ void SystemCoreClockUpdate(void)
       SystemCoreClock = msirange;
       break;
 
-    case 0x04:  /* HSI used as system clock  source */
+    case 0x04:  /* HSI used as system clock source */
       SystemCoreClock = HSI_VALUE;
       break;
 
-    case 0x08:  /* HSE used as system clock  source */
+    case 0x08:  /* HSE used as system clock source */
       SystemCoreClock = HSE_VALUE;
       break;
 
@@ -305,27 +306,24 @@ void SystemCoreClockUpdate(void)
          SYSCLK = PLL_VCO / PLLR
          */
       pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC);
-      pllm = ((RCC->PLLCFGR & RCC_PLLCFGR_PLLM)>> 4) + 1 ;
+      pllm = ((RCC->PLLCFGR & RCC_PLLCFGR_PLLM) >> 4) + 1 ;
 
       switch (pllsource)
       {
-        case 0x00:  /* MSI used as PLL clock source */
-          pllvco = (msirange / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 8);
+        case 0x02:  /* HSI used as PLL clock source */
+          pllvco = (HSI_VALUE / pllm);
           break;
 
-        case 0x01:  /* HSI used as PLL clock source */
-          pllvco = (msirange / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 8);
+        case 0x03:  /* HSE used as PLL clock source */
+          pllvco = (HSE_VALUE / pllm);
           break;
 
-        case 0x02:  /* HSE used as PLL clock source */
-          pllvco = (msirange / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 8);
-          break;
-
-        default:
-          pllvco = (msirange / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 8);
+        default:    /* MSI used as PLL clock source */
+          pllvco = (msirange / pllm);
           break;
       }
-      pllr = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >>25) + 1 ) *2;
+      pllvco = pllvco * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 8);
+      pllr = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >> 25) + 1) * 2;
       SystemCoreClock = pllvco/pllr;
       break;
 
