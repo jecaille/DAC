@@ -1,9 +1,9 @@
 ;/********************* COPYRIGHT(c) 2017 STMicroelectronics ********************
-;* File Name          : startup_stm32l471xx.s
+;* File Name          : startup_stm32l4a6xx.s
 ;* Author             : MCD Application Team
 ;* Version            : V1.3.0
 ;* Date               : 17-February-2017
-;* Description        : STM32L471xx Ultra Low Power Devices vector
+;* Description        : STM32L4A6xx Ultra Low Power Devices vector
 ;*                      This module performs:
 ;*                      - Set the initial SP
 ;*                      - Set the initial PC == _iar_program_start,
@@ -154,7 +154,7 @@ __vector_table
         DCD     COMP_IRQHandler                   ; COMP Interrupt
         DCD     LPTIM1_IRQHandler                 ; LP TIM1 interrupt
         DCD     LPTIM2_IRQHandler                 ; LP TIM2 interrupt
-        DCD     0                                 ; Reserved
+        DCD     OTG_FS_IRQHandler                 ; USB OTG FS
         DCD     DMA2_Channel6_IRQHandler          ; DMA2 Channel 6
         DCD     DMA2_Channel7_IRQHandler          ; DMA2 Channel 7
         DCD     LPUART1_IRQHandler                ; LP UART 1 interrupt
@@ -165,10 +165,19 @@ __vector_table
         DCD     SAI2_IRQHandler                   ; Serial Audio Interface 2 global interrupt
         DCD     SWPMI1_IRQHandler                 ; Serial Wire Interface global interrupt
         DCD     TSC_IRQHandler                    ; Touch Sense Controller global interrupt
-        DCD     0                                 ; Reserved
-        DCD     0                                 ; Reserved
-        DCD     RNG_IRQHandler                    ; RNG global interrupt
+        DCD     LCD_IRQHandler                    ; LCD global interrupt
+        DCD     AES_IRQHandler                    ; AES global interrupt    
+        DCD     HASH_RNG_IRQHandler               ; HASH / RNG global interrupt
         DCD     FPU_IRQHandler                    ; FPU
+        DCD     CRS_IRQHandler                    ; CRS error
+        DCD     I2C4_EV_IRQHandler                ; I2C4 event
+        DCD     I2C4_ER_IRQHandler                ; I2C4 error
+        DCD     DCMI_IRQHandler                   ; DCMI global interrupt
+        DCD     CAN2_TX_IRQHandler                ; CAN2 TX
+        DCD     CAN2_RX0_IRQHandler               ; CAN2 RX0
+        DCD     CAN2_RX1_IRQHandler               ; CAN2 RX1
+        DCD     CAN2_SCE_IRQHandler               ; CAN2 SCE
+        DCD     DMA2D_IRQHandler                  ; DMA2D global interrupt       
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -563,6 +572,11 @@ LPTIM1_IRQHandler
 LPTIM2_IRQHandler
         B LPTIM2_IRQHandler
 
+        PUBWEAK OTG_FS_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+OTG_FS_IRQHandler
+        B OTG_FS_IRQHandler
+
         PUBWEAK DMA2_Channel6_IRQHandler
         SECTION .text:CODE:NOROOT:REORDER(1)
 DMA2_Channel6_IRQHandler
@@ -598,7 +612,7 @@ I2C3_ER_IRQHandler
 SAI1_IRQHandler
         B SAI1_IRQHandler
 
-        PUBWEAK SAI2_IRQHandler
+       PUBWEAK SAI2_IRQHandler
         SECTION .text:CODE:NOROOT:REORDER(1)
 SAI2_IRQHandler
         B SAI2_IRQHandler
@@ -608,20 +622,75 @@ SAI2_IRQHandler
 SWPMI1_IRQHandler
         B SWPMI1_IRQHandler
 
-        PUBWEAK TSC_IRQHandler
-        SECTION .text:CODE:NOROOT:REORDER(1)
+       PUBWEAK TSC_IRQHandler
+       SECTION .text:CODE:NOROOT:REORDER(1)
 TSC_IRQHandler
-        B TSC_IRQHandler
+       B TSC_IRQHandler
 
-        PUBWEAK RNG_IRQHandler
+       PUBWEAK LCD_IRQHandler
+       SECTION .text:CODE:NOROOT:REORDER(1)
+LCD_IRQHandler
+       B LCD_IRQHandler
+       
+        PUBWEAK AES_IRQHandler
         SECTION .text:CODE:NOROOT:REORDER(1)
-RNG_IRQHandler
-        B RNG_IRQHandler
+AES_IRQHandler
+        B AES_IRQHandler       
+
+        PUBWEAK HASH_RNG_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+HASH_RNG_IRQHandler
+        B HASH_RNG_IRQHandler
 
         PUBWEAK FPU_IRQHandler
         SECTION .text:CODE:NOROOT:REORDER(1)
 FPU_IRQHandler
         B FPU_IRQHandler
+        
+        PUBWEAK CRS_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+CRS_IRQHandler
+        B CRS_IRQHandler        
+        
+        PUBWEAK I2C4_EV_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+I2C4_EV_IRQHandler
+        B I2C4_EV_IRQHandler
+
+        PUBWEAK I2C4_ER_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+I2C4_ER_IRQHandler
+        B I2C4_ER_IRQHandler 
+        
+        PUBWEAK DCMI_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+DCMI_IRQHandler
+        B DCMI_IRQHandler                 
+        
+        PUBWEAK CAN2_TX_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+CAN2_TX_IRQHandler
+        B CAN2_TX_IRQHandler
+
+        PUBWEAK CAN2_RX0_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+CAN2_RX0_IRQHandler
+        B CAN2_RX0_IRQHandler
+
+        PUBWEAK CAN2_RX1_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+CAN2_RX1_IRQHandler
+        B CAN2_RX1_IRQHandler
+
+        PUBWEAK CAN2_SCE_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+CAN2_SCE_IRQHandler
+        B CAN2_SCE_IRQHandler
+        
+        PUBWEAK DMA2D_IRQHandler
+        SECTION .text:CODE:NOROOT:REORDER(1)
+DMA2D_IRQHandler
+        B DMA2D_IRQHandler                  
 
         END
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
