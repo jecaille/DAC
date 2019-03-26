@@ -1,9 +1,9 @@
 ;********************** COPYRIGHT(c) 2016  STMicroelectronics ******************
-;* File Name          : startup_stm32l431xx.s
+;* File Name          : startup_stm32l462xx.s
 ;* Author             : MCD Application Team
 ;* Version            : V1.2.0
 ;* Date               : 28-October-2016
-;* Description        : STM32L431xx Ultra Low Power devices vector table for MDK-ARM toolchain.
+;* Description        : STM32L462xx Ultra Low Power devices vector table for MDK-ARM toolchain.
 ;*                      This module performs:
 ;*                      - Set the initial SP
 ;*                      - Set the initial PC == Reset_Handler
@@ -120,7 +120,7 @@ __Vectors       DCD     __initial_sp               ; Top of Stack
                 DCD     TIM1_TRG_COM_IRQHandler           ; TIM1 Trigger and Commutation
                 DCD     TIM1_CC_IRQHandler                ; TIM1 Capture Compare
                 DCD     TIM2_IRQHandler                   ; TIM2
-                DCD     0                                 ; Reserved
+                DCD     TIM3_IRQHandler                   ; TIM3
                 DCD     0                                 ; Reserved
                 DCD     I2C1_EV_IRQHandler                ; I2C1 Event
                 DCD     I2C1_ER_IRQHandler                ; I2C1 Error
@@ -143,37 +143,39 @@ __Vectors       DCD     __initial_sp               ; Top of Stack
                 DCD     SDMMC1_IRQHandler                 ; SDMMC1
                 DCD     0                                 ; Reserved
                 DCD     SPI3_IRQHandler                   ; SPI3
-                DCD     0                                 ; Reserved
+                DCD     UART4_IRQHandler                  ; UART4
                 DCD     0                                 ; Reserved
                 DCD     TIM6_DAC_IRQHandler               ; TIM6 and DAC1&2 underrun errors
-                DCD     TIM7_IRQHandler                   ; TIM7
+                DCD     0                                 ; Reserved
                 DCD     DMA2_Channel1_IRQHandler          ; DMA2 Channel 1
                 DCD     DMA2_Channel2_IRQHandler          ; DMA2 Channel 2
                 DCD     DMA2_Channel3_IRQHandler          ; DMA2 Channel 3
                 DCD     DMA2_Channel4_IRQHandler          ; DMA2 Channel 4
                 DCD     DMA2_Channel5_IRQHandler          ; DMA2 Channel 5
-                DCD     0                                 ; Reserved
-                DCD     0                                 ; Reserved
+                DCD     DFSDM1_FLT0_IRQHandler            ; DFSDM1 Filter 0 global Interrupt
+                DCD     DFSDM1_FLT1_IRQHandler            ; DFSDM1 Filter 1 global Interrupt
                 DCD     0                                 ; Reserved
                 DCD     COMP_IRQHandler                   ; COMP Interrupt
                 DCD     LPTIM1_IRQHandler                 ; LP TIM1 interrupt
                 DCD     LPTIM2_IRQHandler                 ; LP TIM2 interrupt
-                DCD     0                                 ; Reserved
+                DCD     USB_IRQHandler                    ; USB FS
                 DCD     DMA2_Channel6_IRQHandler          ; DMA2 Channel 6
                 DCD     DMA2_Channel7_IRQHandler          ; DMA2 Channel 7
-                DCD     LPUART1_IRQHandler                 ; LP UART1 interrupt
+                DCD     LPUART1_IRQHandler                ; LP UART1 interrupt
                 DCD     QUADSPI_IRQHandler                ; Quad SPI global interrupt
                 DCD     I2C3_EV_IRQHandler                ; I2C3 event
                 DCD     I2C3_ER_IRQHandler                ; I2C3 error
                 DCD     SAI1_IRQHandler                   ; Serial Audio Interface 1 global interrupt
                 DCD     0                                 ; Reserved
-                DCD     SWPMI1_IRQHandler                 ; Serial Wire Interface 1 global interrupt
+                DCD     0                                 ; Reserved
                 DCD     TSC_IRQHandler                    ; Touch Sense Controller global interrupt
                 DCD     0                                 ; Reserved
-                DCD     0                                 ; Reserved
+                DCD     AES_IRQHandler                    ; AES global interrupt
                 DCD     RNG_IRQHandler                    ; RNG global interrupt
                 DCD     FPU_IRQHandler                    ; FPU
                 DCD     CRS_IRQHandler                    ; CRS interrupt
+                DCD     I2C4_EV_IRQHandler                ; I2C4 event
+                DCD     I2C4_ER_IRQHandler                ; I2C4 error
 
 __Vectors_End
 
@@ -268,6 +270,7 @@ Default_Handler PROC
         EXPORT     TIM1_TRG_COM_IRQHandler           [WEAK]
         EXPORT     TIM1_CC_IRQHandler                [WEAK]
         EXPORT     TIM2_IRQHandler                   [WEAK]
+        EXPORT     TIM3_IRQHandler                   [WEAK]
         EXPORT     I2C1_EV_IRQHandler                [WEAK]
         EXPORT     I2C1_ER_IRQHandler                [WEAK]
         EXPORT     I2C2_EV_IRQHandler                [WEAK]
@@ -281,16 +284,19 @@ Default_Handler PROC
         EXPORT     RTC_Alarm_IRQHandler              [WEAK]
         EXPORT     SDMMC1_IRQHandler                 [WEAK]
         EXPORT     SPI3_IRQHandler                   [WEAK]
+        EXPORT     UART4_IRQHandler                  [WEAK]
         EXPORT     TIM6_DAC_IRQHandler               [WEAK]
-        EXPORT     TIM7_IRQHandler                   [WEAK]
         EXPORT     DMA2_Channel1_IRQHandler          [WEAK]
         EXPORT     DMA2_Channel2_IRQHandler          [WEAK]
         EXPORT     DMA2_Channel3_IRQHandler          [WEAK]
         EXPORT     DMA2_Channel4_IRQHandler          [WEAK]
         EXPORT     DMA2_Channel5_IRQHandler          [WEAK]
+        EXPORT     DFSDM1_FLT0_IRQHandler            [WEAK]
+        EXPORT     DFSDM1_FLT1_IRQHandler            [WEAK]
         EXPORT     COMP_IRQHandler                   [WEAK]
         EXPORT     LPTIM1_IRQHandler                 [WEAK]
         EXPORT     LPTIM2_IRQHandler                 [WEAK]
+        EXPORT     USB_IRQHandler                    [WEAK]
         EXPORT     DMA2_Channel6_IRQHandler          [WEAK]
         EXPORT     DMA2_Channel7_IRQHandler          [WEAK]
         EXPORT     LPUART1_IRQHandler                [WEAK]
@@ -298,11 +304,13 @@ Default_Handler PROC
         EXPORT     I2C3_EV_IRQHandler                [WEAK]
         EXPORT     I2C3_ER_IRQHandler                [WEAK]
         EXPORT     SAI1_IRQHandler                   [WEAK]
-        EXPORT     SWPMI1_IRQHandler                 [WEAK]
         EXPORT     TSC_IRQHandler                    [WEAK]
+        EXPORT     AES_IRQHandler                    [WEAK]
         EXPORT     RNG_IRQHandler                    [WEAK]
         EXPORT     FPU_IRQHandler                    [WEAK]
         EXPORT     CRS_IRQHandler                    [WEAK]
+        EXPORT     I2C4_EV_IRQHandler                [WEAK]
+        EXPORT     I2C4_ER_IRQHandler                [WEAK]
 
 WWDG_IRQHandler
 PVD_PVM_IRQHandler
@@ -333,6 +341,7 @@ TIM1_UP_TIM16_IRQHandler
 TIM1_TRG_COM_IRQHandler
 TIM1_CC_IRQHandler
 TIM2_IRQHandler
+TIM3_IRQHandler
 I2C1_EV_IRQHandler
 I2C1_ER_IRQHandler
 I2C2_EV_IRQHandler
@@ -346,16 +355,19 @@ EXTI15_10_IRQHandler
 RTC_Alarm_IRQHandler
 SDMMC1_IRQHandler
 SPI3_IRQHandler
+UART4_IRQHandler
 TIM6_DAC_IRQHandler
-TIM7_IRQHandler
 DMA2_Channel1_IRQHandler
 DMA2_Channel2_IRQHandler
 DMA2_Channel3_IRQHandler
 DMA2_Channel4_IRQHandler
 DMA2_Channel5_IRQHandler
+DFSDM1_FLT0_IRQHandler
+DFSDM1_FLT1_IRQHandler
 COMP_IRQHandler
 LPTIM1_IRQHandler
 LPTIM2_IRQHandler
+USB_IRQHandler
 DMA2_Channel6_IRQHandler
 DMA2_Channel7_IRQHandler
 LPUART1_IRQHandler
@@ -363,11 +375,13 @@ QUADSPI_IRQHandler
 I2C3_EV_IRQHandler
 I2C3_ER_IRQHandler
 SAI1_IRQHandler
-SWPMI1_IRQHandler
 TSC_IRQHandler
+AES_IRQHandler
 RNG_IRQHandler
 FPU_IRQHandler
 CRS_IRQHandler
+I2C4_EV_IRQHandler
+I2C4_ER_IRQHandler
 
                 B       .
 
